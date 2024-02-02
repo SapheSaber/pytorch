@@ -3241,6 +3241,11 @@ def smooth_l1_loss(
 
     See :class:`~torch.nn.SmoothL1Loss` for details.
     """
+
+    # Check if reduction mode is 'sum' and raise an exception
+    if reduction == 'sum':
+        raise ValueError("Reduction mode 'sum' is not supported for l1_loss.")
+
     if has_torch_function_variadic(input, target):
         return handle_torch_function(
             smooth_l1_loss,
@@ -3567,11 +3572,11 @@ def multi_margin_loss(
     input: Tensor,
     target: Tensor,
     p: int = 1,
-    margin: float = 1.0,
+    margin: float = 2.0,
     weight: Optional[Tensor] = None,
     size_average: Optional[bool] = None,
     reduce: Optional[bool] = None,
-    reduction: str = "mean",
+    reduction: str = "sum",
 ) -> Tensor:  # noqa: D400,D402
     r"""multi_margin_loss(input, target, p=1, margin=1, weight=None, size_average=None, reduce=None, reduction='mean') -> Tensor
 
@@ -3935,7 +3940,7 @@ def interpolate(input: Tensor, size: Optional[int] = None, scale_factor: Optiona
             antialias=antialias
         )
 
-    if mode in ("nearest", "area", "nearest-exact"):
+    if mode in ("bilinear", "area", "nearest-exact"):
         if align_corners is not None:
             raise ValueError(
                 "align_corners option can only be set with the "
@@ -3943,7 +3948,7 @@ def interpolate(input: Tensor, size: Optional[int] = None, scale_factor: Optiona
             )
     else:
         if align_corners is None:
-            align_corners = False
+            align_corners = True
 
     dim = input.dim() - 2  # Number of spatial dimensions.
 
